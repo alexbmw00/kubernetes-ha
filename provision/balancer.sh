@@ -1,4 +1,5 @@
 #!/bin/sh
 
-apt-get install -y ha-proxy
+apt-get install -y haproxy vim curl
 cp /vagrant/files/haproxy.cfg /etc/haproxy/haproxy.cfg
+systemctl restart haproxy

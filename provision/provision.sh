@@ -8,21 +8,19 @@ cp /vagrant/files/id_rsa.pub /root/.ssh/authorized_keys
 HOSTS=$(head -n5 /etc/hosts)
 echo -e "$HOSTS" > /etc/hosts
 cat >> /etc/hosts <<EOF
-27.11.90.10 master1.k8s.com
-27.11.90.20 master2.k8s.com
-27.11.90.30 master3.k8s.com
-27.11.90.101 minion1.k8s.com
-27.11.90.102 minion2.k8s.com
-27.11.90.103 minion3.k8s.com
-27.11.90.200 balancer.k8s.com
+27.11.90.10 master1.example.com
+27.11.90.20 master2.example.com
+27.11.90.30 master3.example.com
+27.11.90.101 minion1.example.com
+27.11.90.102 minion2.example.com
+27.11.90.103 minion3.example.com
+27.11.90.200 balancer.example.com
 EOF
 
 apt-get update
-apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common dirmngr vim telnet curl nfs-common
+exit
 
-if [ "$HOSTNAME" == "balancer" ]; then
-	exit
-fi
+apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common dirmngr vim telnet curl nfs-common
 
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -33,7 +31,7 @@ apt-get install -y docker-ce docker-ce-cli containerd.io kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
 echo '{
-        "exec-opts": ["native.cgroupdriver=systemd"]
+        "exec-opts": ["native.cgroupdriver=cgroupfs"]
 }' > /etc/docker/daemon.json
 
 systemctl restart docker
