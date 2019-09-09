@@ -34,9 +34,9 @@ curl -s https://docs.projectcalico.org/v3.7/manifests/calico.yaml > /root/calico
 sed -i 's?192.168.0.0/16?10.244.0.0/16?g' /root/calico.yml
 kubectl apply -f /root/calico.yml
 
-ssh -o stricthostkeychecking=no 27.11.90.20 hostname
-ssh -o stricthostkeychecking=no 27.11.90.30 hostname
+#ssh -o stricthostkeychecking=no 27.11.90.20 hostname
+#ssh -o stricthostkeychecking=no 27.11.90.30 hostname
 
-scp /var/cache/apt/archives/* ssh 27.11.90.20:/var/cache/apt/archives/
-ssh 27.11.90.20 '> /tmp/done'
-scp /var/cache/apt/archives/* ssh 27.11.90.30:/var/cache/apt/archives/
+#scp /var/cache/apt/archives/* ssh 27.11.90.20:/var/cache/apt/archives/
+#ssh 27.11.90.20 '> /tmp/done'
+#scp /var/cache/apt/archives/* ssh 27.11.90.30:/var/cache/apt/archives/
