@@ -2,9 +2,16 @@
 
 while true; do
 
-    if [ ! -f '/tmp/done' ]; then
+    ssh -o stricthostkeychecking=no 27.11.90.10 test -f /root/calico.yml
+    if [ $? == "0" ]; then
         sleep 5
         continue
+    fi
+    
+    if [ "$HOSTNAME" == 'master2' ]; then
+        ssh 27.11.90.10 'scp -a /var/cache/apt/archives/* ssh -o stricthostkeychecking=no 27.11.90.20:/var/cache/apt/archives/'
+    else
+        ssh 27.11.90.10 'scp -a /var/cache/apt/archives/* ssh -o stricthostkeychecking=no 27.11.90.30:/var/cache/apt/archives/'
     fi
 
     apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common dirmngr vim telnet curl nfs-common
@@ -27,10 +34,8 @@ while true; do
 
     echo "KUBELET_EXTRA_ARGS='--node-ip=27.11.90.$1'" > /etc/default/kubelet
 
-    ssh -o stricthostkeychecking=no 27.11.90.10 hostname
     if [ "$HOSTNAME" == 'master2' ]; then
         ssh 27.11.90.10 'docker images | awk -F'\'' '\'' '\''NR>1 {print $1":"$2}'\'' | while read IMAGE; do docker save $IMAGE | ssh 27.11.90.20 docker load; done'
-        ssh -o stricthostkeychecking=no 27.11.90.30 '> /tmp/done'
     else
         ssh 27.11.90.10 'docker images | awk -F'\'' '\'' '\''NR>1 {print $1":"$2}'\'' | while read IMAGE; do docker save $IMAGE | ssh 27.11.90.30 docker load; done'
     fi
