@@ -28,12 +28,16 @@ while true; do
     echo "KUBELET_EXTRA_ARGS='--node-ip=27.11.90.$1'" > /etc/default/kubelet
 
     ssh -o stricthostkeychecking=no 27.11.90.10 hostname
-    ssh 27.11.90.10 'docker images | awk -F'\'' '\'' '\''NR>1 {print $1":"$2}'\'' | while read IMAGE; do docker save $IMAGE | ssh 27.11.90.20 docker load; done'
+    if [ "$HOSTNAME" == 'master2' ]; then
+        ssh 27.11.90.10 'docker images | awk -F'\'' '\'' '\''NR>1 {print $1":"$2}'\'' | while read IMAGE; do docker save $IMAGE | ssh 27.11.90.20 docker load; done'
+        ssh -o stricthostkeychecking=no 27.11.90.30 '> /tmp/done'
+    else
+        ssh 27.11.90.10 'docker images | awk -F'\'' '\'' '\''NR>1 {print $1":"$2}'\'' | while read IMAGE; do docker save $IMAGE | ssh 27.11.90.30 docker load; done'
+    fi
 
     CERTIFICATE_KEY="$(ssh 27.11.90.10 'kubeadm init phase upload-certs --upload-certs | tail -n1')"
     $(ssh 27.11.90.10 kubeadm token create --print-join-command) --control-plane --certificate-key "$CERTIFICATE_KEY" --apiserver-advertise-address 27.11.90.$1
     apt-get clean
-    ssh -o stricthostkeychecking=no 27.11.90.30 '> /tmp/done'
     exit 0
 
 done
