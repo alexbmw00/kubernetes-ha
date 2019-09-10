@@ -52,7 +52,7 @@ function provision() {
 }
 
 for X in 20 30; do
-    provision $X &
+    provision $X
 done
 
 wait
