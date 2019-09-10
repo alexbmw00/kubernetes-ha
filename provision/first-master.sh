@@ -34,9 +34,27 @@ curl -s https://docs.projectcalico.org/v3.7/manifests/calico.yaml > /root/calico
 sed -i 's?192.168.0.0/16?10.244.0.0/16?g' /root/calico.yml
 kubectl apply -f /root/calico.yml
 
-#ssh -o stricthostkeychecking=no 27.11.90.20 hostname
-#ssh -o stricthostkeychecking=no 27.11.90.30 hostname
+# Copia pacotes, diminuindo consumo de rede
 
-#scp /var/cache/apt/archives/* ssh 27.11.90.20:/var/cache/apt/archives/
-#ssh 27.11.90.20 '> /tmp/done'
-#scp /var/cache/apt/archives/* ssh 27.11.90.30:/var/cache/apt/archives/
+ssh -o stricthostkeychecking=no 27.11.90.20 hostname
+ssh -o stricthostkeychecking=no 27.11.90.30 hostname
+
+
+KEY="$(kubeadm init phase upload-certs --upload-certs | tail -n1)"
+JOIN="$(kubeadm token create --print-join-command)"
+
+function provision() {
+    ssh -o stricthostkeychecking=no 27.11.90.$1 hostname
+    scp -r /var/cache/apt/archives/* 27.11.90.$1:/var/cache/apt/archives/
+    ssh 27.11.90.$1 "bash /vagrant/provision/other-master.sh '$1'"
+    docker images | awk -F' ' 'NR>1 {print $1":"$2}' | while read IMAGE; do docker save $IMAGE | ssh 27.11.90.$1 docker load; done
+    ssh 27.11.90.$1 "$JOIN --control-plane --certificate-key $KEY --apiserver-advertise-address 27.11.90.$1"
+}
+
+for X in 20 30; do
+    provision $X &
+done
+
+wait
+apt-get clean
+exit 0

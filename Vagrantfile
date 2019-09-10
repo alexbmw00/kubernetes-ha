@@ -3,9 +3,9 @@
 
 vms = {
 	'balancer' => {'memory' => '256', 'cpus' => 1, 'ip' => '200', 'provision' => 'balancer.sh'},
+	'master3' => {'memory' => '2048', 'cpus' => 2, 'ip' => '30', 'provision' => 'dummy.sh'},
+	'master2' => {'memory' => '2048', 'cpus' => 2, 'ip' => '20', 'provision' => 'dummy.sh'},
 	'master1' => {'memory' => '2048', 'cpus' => 2, 'ip' => '10', 'provision' => 'first-master.sh'},
-	'master2' => {'memory' => '2048', 'cpus' => 2, 'ip' => '20', 'provision' => 'second-master.sh'},
-	'master3' => {'memory' => '2048', 'cpus' => 2, 'ip' => '30', 'provision' => 'second-master.sh'},
 #	'node1' => {'memory' => '1024', 'cpus' => 1, 'ip' => '101', 'provision' => 'node.sh'},
 }
 
